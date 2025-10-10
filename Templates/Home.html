@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="jumbotron text-center py-5 bg-light">
+    <h1 class="display-4">Welcome to Lost & Found Tracker</h1>
+    <p class="lead">Report your lost or found items and get matched automatically with AI.</p>
+    <a href="{% url 'report_lost' %}" class="btn btn-primary btn-lg">Report Lost Item</a>
+    <a href="{% url 'report_found' %}" class="btn btn-success btn-lg">Report Found Item</a>
+</div>
+{% endblock %}

@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
-def Report_Lost(request):
+def report_lost(request):
     name = request.POST.get("Product name")
     description = request.POST.get("Description")
     category = request.POST.get("Category")
@@ -23,7 +23,7 @@ def Report_Lost(request):
     else:
         return render(request, 'report_lost.html', {'error': 'Please fill in all required fields.'})
         return render(request, 'report_lost.html')
-def Report_Found(request):
+def report_found(request):
     name = request.POST.get("Product name")
     description = request.POST.get("Description")
     category = request.POST.get("Category")
@@ -42,5 +42,5 @@ def Report_Found(request):
         return render(request, 'report_found.html', {'error': 'Please fill in all required fields.'})
         return render(request, 'report_found.html') 
 def Product(request):
-    return render(request, 'Product.html', {'style': 'Style.css'})
+    return render(request, 'report_found.html', {'style': 'Style.css'})
 
