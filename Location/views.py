@@ -1,6 +1,4 @@
 from django.shortcuts import render
-
-# Create your views here.
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.utils.timezone import now
@@ -9,17 +7,13 @@ from django.contrib import messages
 from .models import Location, LocationLog, LocationSettings, LocationReport
 
 
-# -------------------------------
-# List all locations
-# -------------------------------
+
 def location_list(request):
     locations = Location.objects.all()
     return render(request, "locations/location_list.html", {"locations": locations})
 
 
-# -------------------------------
-# Location Detail with reports & settings
-# -------------------------------
+
 def location_detail(request, pk):
     location = get_object_or_404(Location, pk=pk)
     reports = location.reports.all()
@@ -34,9 +28,7 @@ def location_detail(request, pk):
     })
 
 
-# -------------------------------
-# Create a new location
-# -------------------------------
+
 def location_create(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -53,9 +45,7 @@ def location_create(request):
     return render(request, "locations/location_form.html")
 
 
-# -------------------------------
-# Update a location
-# -------------------------------
+
 def location_update(request, pk):
     location = get_object_or_404(Location, pk=pk)
 
@@ -73,9 +63,7 @@ def location_update(request, pk):
     return render(request, "locations/location_form.html", {"location": location})
 
 
-# -------------------------------
-# Delete a location
-# -------------------------------
+
 def location_delete(request, pk):
     location = get_object_or_404(Location, pk=pk)
     name = location.name
@@ -88,9 +76,7 @@ def location_delete(request, pk):
     return render(request, "locations/location_confirm_delete.html", {"location": location})
 
 
-# -------------------------------
-# Manage Location Settings
-# -------------------------------
+
 def location_settings(request, pk):
     location = get_object_or_404(Location, pk=pk)
     settings, created = LocationSettings.objects.get_or_create(location=location)
@@ -109,9 +95,7 @@ def location_settings(request, pk):
     return render(request, "locations/location_settings.html", {"location": location, "settings": settings})
 
 
-# -------------------------------
-# Submit a report for a location
-# -------------------------------
+
 def submit_report(request, pk):
     location = get_object_or_404(Location, pk=pk)
 
@@ -127,7 +111,6 @@ def submit_report(request, pk):
             description=description,
         )
 
-        # Log the action
         LocationLog.objects.create(location=location, action="Report submitted")
 
         messages.success(request, "Report submitted successfully!")
@@ -136,11 +119,8 @@ def submit_report(request, pk):
     return render(request, "locations/report_form.html", {"location": location})
 
 
-# -------------------------------
-# API Endpoint: Recent Logs for AJAX
-# -------------------------------
+
 def get_logs(request, pk):
     location = get_object_or_404(Location, pk=pk)
     logs = location.logs.values("action", "timestamp", "ip_address")[:10]
     return JsonResponse(list(logs), safe=False)
-

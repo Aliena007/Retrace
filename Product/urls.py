@@ -14,10 +14,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
+
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
+from .api_views import LostProductViewSet, FoundProductViewSet, MatchResultViewSet, NotificationViewSet, RouteMapViewSet
+
+router = DefaultRouter()
+router.register(r'lost', LostProductViewSet, basename='lost')
+router.register(r'found', FoundProductViewSet, basename='found')
+router.register(r'matches', MatchResultViewSet, basename='matches')
+router.register(r'notifications', NotificationViewSet, basename='notifications')
+router.register(r'routes', RouteMapViewSet, basename='routes')
 
 urlpatterns = [
     path('report_lost/', views.report_lost, name='report_lost'),
     path('report_found/', views.report_found, name='report_found'),
+    path('api/ai/', include(router.urls))
 ]
