@@ -1,10 +1,29 @@
-{% extends 'base.html' %}
-{% block title %}Home{% endblock %}
-{% block content %}
-<div class="jumbotron text-center py-5 bg-light">
-    <h1 class="display-4">Welcome to Lost & Found Tracker</h1>
-    <p class="lead">Report your lost or found items and get matched automatically with AI.</p>
-    <a href="{% url 'report_lost' %}" class="btn btn-primary btn-lg">Report Lost Item</a>
-    <a href="{% url 'report_found' %}" class="btn btn-success btn-lg">Report Found Item</a>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="Retrace-removebg-preview (1).png">
+  <link rel="stylesheet" href="Style.CSS">
+  <title>Retrace</title>
+</head>
+<body>
+<header class="header">
+  <div class="header-container">
+    <img src="Retrace 1.png" alt="Retrace" class="header-text">
+  <div >
+    <a href="home" class="header-link">Home</a>
+    <a href="about" class="header-link">About</a>
+    <a href="contact" class="header-link">Contact</a>
+    <a href="Login.html" class="header-link">Login</a>
+  </div>
+  </div>  
+</header>
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="hero-title">Welcome to Retrace</h1>
+    <p class="hero-subtitle">Lost? Let's Retrace.</p>
+  </div>
+</section>
+</body>
+</html>

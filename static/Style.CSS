@@ -1,0 +1,105 @@
+.header {
+    background-color: white;
+}
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+.header-text {
+    position: left;
+      top: 20px;
+      right: 20px;
+      width: 250px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.header-link {
+    text-decoration: none;
+    color: rgb(44, 100, 117);
+    font-weight: bold;
+    font-size: 24px;
+    font-family: 'Lato', sans-serif;
+    margin-left: 20px;
+    margin-top: 10px;
+    display: inline-block;
+    padding: 10px 15px;
+    border: 2px solid rgb(44, 100, 117);
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: background-color 0.3s, color 0.3s;
+}
+.header-link:hover {
+    background-color: rgb(17, 65, 105);
+    color: white;
+}
+.hero{
+    background-color:white;
+    color: rgb(44, 100, 117);
+    text-align: left;
+    padding: 50px 20px;
+
+    font-family: 'Lato', sans-serif;
+}
+body, html {
+  height: 50%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.bg-img {
+  /* The image used */
+  background-image: url("Retrace.png");
+
+  /* Control the height of the image */
+  min-height: 900px;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+}
+
+/* Add styles to the form container */
+.container {
+  position: absolute;
+  right: 0;
+  margin: 20px;
+  max-width: 300px;
+  padding: 16px;
+  background-color: white;
+}
+
+/* Full-width input fields */
+  input[type=text], input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for the submit button */
+.btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  opacity: 0.9;
+}
+
+.btn:hover {
+  opacity: 1;
+}
