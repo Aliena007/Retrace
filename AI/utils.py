@@ -74,10 +74,11 @@ def send_match_notification(lost, found):
     """Create notifications for both users when a match is found."""
     try:
         msg = (
-            f"Match found: Lost item '{lost.title}' (id={lost.id}) "
-            f"matched with Found item '{found.title}' (id={found.id})."
+            f"Match found: Lost item '{lost.name}' (id={lost.id}) "
+            f"matched with Found item '{found.name}' (id={found.id}). "
+            f"Contact: {lost.contact_info}"
         )
-        Notification.objects.create(user=lost.user, message=msg)
-        Notification.objects.create(user=found.user, message=msg)
+        Notification.objects.create(user_contact=lost.contact_info, message=msg)
+        Notification.objects.create(user_contact=found.contact_info, message=msg)
     except Exception:
         pass
