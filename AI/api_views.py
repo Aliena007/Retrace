@@ -94,7 +94,7 @@ class FoundProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        found = serializer.save(user=self.request.user)
+        found = serializer.save()
 
         if getattr(settings, 'CELERY_ENABLED', False):
             try:
