@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="form-page">
+    <h2>Report Found Product</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Product Name:</label>
+        <input type="text" name="name" required>
+        <label>Category:</label>
+        <input type="text" name="category" required>
+        <label>Description:</label>
+        <textarea name="description" required></textarea>
+        <label>Date Found:</label>
+        <input type="date" name="date_found" required>
+        <label>Upload Image:</label>
+        <input type="file" name="image" onchange="previewImage(this,'preview')">
+        <img id="preview" src="#" alt="Image Preview" style="display:none; width:150px; margin-top:10px;">
+        <button type="submit" class="btn">Submit</button>
+    </form>
+</section>
+{% endblock %}

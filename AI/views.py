@@ -189,6 +189,6 @@ from django.shortcuts import render
 def home(request):
     # You can pass any context, e.g., route_data
     route_data = {}  # or precompute as needed
-    return render(request, "home.html", {"route_data": route_data})
+    return render(request, "Home.html", {"route_data": route_data})
 
     return JsonResponse(route_data, safe=False)

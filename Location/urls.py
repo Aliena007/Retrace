@@ -25,6 +25,6 @@ urlpatterns = [
     path('locations/create/', views.location_create, name='location-create'),
     path('locations/<int:pk>/update/', views.location_update, name='location-update'),
     path('locations/<int:pk>/delete/', views.location_delete, name='location-delete'),
-    path('locations/<int:pk>/settings/', views.location_settings, name='location-settings-update'),
+    path('locations/<int:pk>/settings/', views.Location_settings, name='location-settings-update'),
     # path('locations/<int:pk>/reports/', views.location_report, name='location-reports'),  # Removed duplicate/conflicting route
 ]

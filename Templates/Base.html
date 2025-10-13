@@ -1,29 +1,43 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">  
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="{% static 'Retrace-removebg-preview (1).png' %}">
-  <link rel="stylesheet" href="{% static 'Style.CSS' %}">
-  <title>{% block title %}Retrace{% endblock %}</title>
-  {% block extra_head %}{% endblock %}
-</head>   
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retrace</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
 <body>
-<header class="header">
-  <div class="header-container">
-    <img src="{% static 'Retrace 1.png' %}" alt="Retrace" class="header-text">
-  <div >
-    <a href="{% url 'home' %}" class="header-link">Home</a>
-    <a href="{% url 'login1' %}" class="header-link">Contact</a>
-    <a href="{% url 'signin' %}" class="header-link">Sign In</a>
-
-  </div>
+<header>
+    <div class="logo">
+        <img src="{% static 'images/logo.png' %}" alt="Retrace Logo">
+        <h1>Retrace</h1>
+    </div>
+    <nav>
+        <ul>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'lost_product' %}">Lost Product</a></li>
+            <li><a href="{% url 'found_product' %}">Found Product</a></li>
+            <li><a href="{% url 'notifications' %}">Notifications</a></li>
+            <li><a href="{% url 'profile' %}">Profile</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 </header>
-  </div>  
-  <footer>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
     <p>&copy; 2025 Retrace. All rights reserved.</p>
-  </footer>
-{% block content %}{% endblock %}
+</footer>
+
+<script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

@@ -92,7 +92,7 @@ def location_settings(request, pk):
         messages.success(request, "Settings updated successfully!")
         return redirect("location_detail", pk=pk)
 
-    return render(request, "locations/location_settings.html", {"location": location, "settings": settings})
+    return render(request, "Location_settings.html", {"location": location, "settings": settings})
 
 
 

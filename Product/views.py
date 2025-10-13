@@ -21,8 +21,8 @@ def report_lost(request):
         # Save the lost product report to the database
         return HttpResponse("Lost product reported successfully.")
     else:
-        return render(request, 'reportLI.html', {'error': 'Please fill in all required fields.'})
-        return render(request, 'reportLi.html')
+        return render(request, 'Lost_product.html', {'error': 'Please fill in all required fields.'})
+        return render(request, 'Lost_product.html')
 def report_found(request):
     name = request.POST.get("Product name")
     description = request.POST.get("Description")
@@ -39,8 +39,8 @@ def report_found(request):
         # Save the found product report to the database
         return HttpResponse("Found product reported successfully.")
     else:
-        return render(request, 'reportFI.html', {'error': 'Please fill in all required fields.'})
-        return render(request, 'reportFI.html') 
+        return render(request, 'Found_product.html', {'error': 'Please fill in all required fields.'})
+        return render(request, 'Found_product.html') 
 def Product(request):
-    return render(request, 'recent.html', {'style': 'Style.css'})
+    return render(request, 'Dashboard.html', {'style': 'Style.css'})
 

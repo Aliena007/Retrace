@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="settings-page">
+    <h2>User Settings</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Username:</label>
+        <input type="text" name="username" value="{{ user.username }}" required>
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ user.email }}" required>
+        <label>Change Password:</label>
+        <input type="password" name="password">
+        <button type="submit" class="btn">Update</button>
+    </form>
+</section>
+{% endblock %}

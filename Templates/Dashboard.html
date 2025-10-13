@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="dashboard">
+    <h2>Welcome, {{ user.username }}</h2>
+    <div class="cards">
+        <div class="card">
+            <h3>Lost Items</h3>
+            <p>{{ lost_items_count }}</p>
+            <a href="{% url 'lost_product' %}" class="btn">View</a>
+        </div>
+        <div class="card">
+            <h3>Found Items</h3>
+            <p>{{ found_items_count }}</p>
+            <a href="{% url 'found_product' %}" class="btn">View</a>
+        </div>
+        <div class="card">
+            <h3>Notifications</h3>
+            <p>{{ notifications_count }}</p>
+            <a href="{% url 'notifications' %}" class="btn">View</a>
+        </div>
+        <div class="card">
+            <h3>Route Map</h3>
+            <a href="{% url 'route_map' %}" class="btn">Open Map</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
