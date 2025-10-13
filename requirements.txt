@@ -1,11 +1,10 @@
 Django>=5.2.5
 djangorestframework>=3.14
-torch>=2.0
-ftfy
-regex
-transformers
-clip-anytorch
+django-cors-headers
+djangorestframework-simplejwt
+emergentintegrations
+python-dotenv
+asgiref
+uvicorn
 Pillow
 numpy
-celery>=5.2
-redis>=4.5
