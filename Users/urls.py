@@ -13,7 +13,7 @@ urlpatterns = [
     path('token/', CustomObtainAuthToken.as_view(), name='token'),
     # Removed Login view
     # Removed Register view
-    path('Base/', views.home, name='Home'),
+    # Removed Base view
     path('Profile/', views.user_profile, name='UserProfile'),
     path('', include(router.urls)),
 
