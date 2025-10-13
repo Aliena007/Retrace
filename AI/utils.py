@@ -52,7 +52,7 @@ def generate_embedding(image_field):
 
 def cosine_similarity(emb_a_bytes, emb_b_bytes):
     """Compute cosine similarity between two byte-encoded embeddings."""
-    if emb_a__bytes is None or emb_b_bytes is None:
+    if emb_a_bytes is None or emb_b_bytes is None:
         return 0.0
     try:
         a = np.frombuffer(emb_a_bytes, dtype=np.float32)
