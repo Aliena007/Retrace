@@ -1,47 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>  
-    <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/x-icon" href="{% static 'Retrace-removebg-preview (1).png' %}">
-        <link rel="stylesheet" href="{% static 'Style.CSS' %}">
-        <title>About Retrace</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f4f4f4;
-            }
-            .container {
-                max-width: 800px;
-                margin: 50px auto;
-                padding: 20px;
-                background-color: #fff;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-            h1 {
-                text-align: center;
-                color: #333;
-            }
-            p {
-                line-height: 1.6;
-                color: #666;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>About Retrace</h1>
-            <p>Retrace is a powerful tool designed to help you track and manage your digital footprint.</p>
-            <p>Our mission is to provide users with the insights and tools they need to take control of their online presence.</p>
-        </div>
-    </body>
-</html>
 {% extends 'Base.html' %}
 {% block title %}About Retrace{% endblock %}
 {% block content %}
-        <div class="container">
+        <div>
             <h1>About Retrace</h1>
             <p>Retrace is a powerful tool designed to help you track and manage your digital footprint.</p>
             <p>Our mission is to provide users with the insights and tools they need to take control of their online presence.</p>
