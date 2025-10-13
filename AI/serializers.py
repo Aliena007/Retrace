@@ -5,30 +5,36 @@ from .models import LostProduct, FoundProduct, MatchResult, Notification, RouteM
 class LostProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = LostProduct
-        fields = ['id', 'user', 'name', 'description', 'image', 'email', 'phone_number', 'location', 'latitude', 'longitude', 'created_at']
-        read_only_fields = ['user', 'created_at']
+        fields = ['id', 'name', 'description', 'date_lost', 'location_lost', 'contact_info', 'image', 'created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at']
 
 
 class FoundProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = FoundProduct
-        fields = ['id', 'user', 'name', 'description', 'image', 'email', 'phone_number', 'location', 'latitude', 'longitude', 'created_at']
-        read_only_fields = ['user', 'created_at']
+        fields = ['id', 'name', 'description', 'date_found', 'location_found', 'contact_info', 'image', 'created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at']
 
 
 class MatchResultSerializer(serializers.ModelSerializer):
+    lost_product_name = serializers.CharField(source='lost_product.name', read_only=True)
+    found_product_name = serializers.CharField(source='found_product.name', read_only=True)
+    
     class Meta:
         model = MatchResult
-        fields = ['id', 'lost_product', 'found_product', 'similarity_score', 'threshold_used', 'match_status', 'notified_users', 'timestamp']
+        fields = ['id', 'lost_product', 'found_product', 'lost_product_name', 'found_product_name', 'match_score', 'created_at']
+        read_only_fields = ['created_at']
 
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = ['id', 'user', 'message', 'sent_via', 'is_sent', 'created_at']
+        fields = ['id', 'user_contact', 'message', 'sent_at']
+        read_only_fields = ['sent_at']
 
 
 class RouteMapSerializer(serializers.ModelSerializer):
     class Meta:
         model = RouteMap
-        fields = ['id', 'product', 'route_data', 'created_at']
+        fields = ['id', 'lost_product', 'found_product', 'route_data', 'created_at']
+        read_only_fields = ['created_at']
