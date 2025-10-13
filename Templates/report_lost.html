@@ -1,54 +1,23 @@
-{% extends 'base.html' %}
-{% block title %}Report Lost Item{% endblock %}
+{% extends 'Base.html' %}
+{% block title %}Report Lost Item - Retrace{% endblock %}
 {% block content %}
-<div class="card p-4 shadow-sm">
-    <h3 class="mb-3">Report Lost Item</h3>
-    {% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label class="form-label">Product Name</label>
-            <input type="text" class="form-control" name="Product_name" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea class="form-control" name="Description" rows="3" required></textarea>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Category</label>
-            <input type="text" class="form-control" name="Category" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Status</label>
-            <input type="text" class="form-control" name="Status" value="Lost" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Image</label>
-            <input type="file" class="form-control" name="Image" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Location</label>
-            <input type="text" class="form-control" name="Location" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Reporter Name</label>
-            <input type="text" class="form-control" name="Reporter_Name" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Reporter Contact</label>
-            <input type="text" class="form-control" name="Reporter_Contact" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" name="Email">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Additional Info</label>
-            <textarea class="form-control" name="Additional_Info" rows="2"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-</div>
-{% endblock %}
+<section class="report-lost">
+  <h1 class="report-lost-title">Report a Lost Item</h1>
+  <form action="{% url 'report_lost' %}" method="post" class="report-lost-form">
+    {% csrf_token %}
+    <label for="item_name" class="report-lost-label">Item Name:</label>
+    <input type="text" id="item_name" name="item_name" class="report-lost-input" required>
+
+    <label for="description" class="report-lost-label">Description:</label>
+    <textarea id="description" name="description" class="report-lost-textarea" required></textarea>
+
+    <label for="date_lost" class="report-lost-label">Date Lost:</label>
+    <input type="date" id="date_lost" name="date_lost" class="report-lost-input" required>
+
+    <label for="location_lost" class="report-lost-label">Location Lost:</label>
+    <input type="text" id="location_lost" name="location_lost" class="report-lost-input" required>
+
+    <button type="submit" class="report-lost-button">Submit</button>
+  </form>
+</section>
+{% endblock %}  

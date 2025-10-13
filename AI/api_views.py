@@ -2,13 +2,15 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from django.conf import settings
 
 from .models import LostProduct, FoundProduct, MatchResult, Notification, RouteMap
 from .serializers import (
     LostProductSerializer, FoundProductSerializer, MatchResultSerializer, NotificationSerializer, RouteMapSerializer
 )
+from .utils import generate_embedding, cosine_similarity, send_match_notification  # moved AI helpers to utils
 
-# Avoid heavy imports at module import time
+# AI availability check
 try:
     import torch
     import clip
@@ -25,26 +27,16 @@ class LostProductViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         lost = serializer.save(user=self.request.user)
-        from django.conf import settings
+
         if getattr(settings, 'CELERY_ENABLED', False):
             try:
                 from .tasks import run_match_for_item
                 run_match_for_item.delay('lost', lost.id)
             except Exception:
-                # Fall back to inline matching on failure to enqueue
                 pass
             return
 
-        # Inline matching fallback
-        if not AI_AVAILABLE:
-            return
-
-        try:
-            from .views import generate_embedding, cosine_similarity, send_match_notification
-        except Exception:
-            return
-
-        if not lost.image:
+        if not AI_AVAILABLE or not lost.image:
             return
 
         lost_embedding = generate_embedding(lost.image)
@@ -57,8 +49,8 @@ class LostProductViewSet(viewsets.ModelViewSet):
             MatchResult.objects.create(
                 lost_product=lost,
                 found_product=found,
-                lost_embedding=lost_embedding if lost_embedding else b'',
-                found_embedding=found_embedding if found_embedding else b'',
+                lost_embedding=lost_embedding or b'',
+                found_embedding=found_embedding or b'',
                 similarity_score=similarity,
                 match_status=status_str,
             )
@@ -66,16 +58,15 @@ class LostProductViewSet(viewsets.ModelViewSet):
                 send_match_notification(lost, found)
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
-    def match(self, request, pk=None):
+    def match(self, _request, _pk=None):
         lost = self.get_object()
-        if not AI_AVAILABLE:
-            return Response({"detail": "AI dependencies (torch/clip) are not available."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-        # Lazy import helper functions
-        from .views import generate_embedding, cosine_similarity, send_match_notification
+        if not AI_AVAILABLE:
+            return Response({"detail": "AI dependencies not available."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         lost_embedding = generate_embedding(lost.image) if lost.image else None
         results = []
+
         for found in FoundProduct.objects.all():
             if not found.image or not lost_embedding:
                 continue
@@ -85,8 +76,8 @@ class LostProductViewSet(viewsets.ModelViewSet):
             MatchResult.objects.create(
                 lost_product=lost,
                 found_product=found,
-                lost_embedding=lost_embedding if lost_embedding else b'',
-                found_embedding=found_embedding if found_embedding else b'',
+                lost_embedding=lost_embedding or b'',
+                found_embedding=found_embedding or b'',
                 similarity_score=similarity,
                 match_status=status_str,
             )
@@ -104,7 +95,7 @@ class FoundProductViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         found = serializer.save(user=self.request.user)
-        from django.conf import settings
+
         if getattr(settings, 'CELERY_ENABLED', False):
             try:
                 from .tasks import run_match_for_item
@@ -113,15 +104,7 @@ class FoundProductViewSet(viewsets.ModelViewSet):
                 pass
             return
 
-        if not AI_AVAILABLE:
-            return
-
-        try:
-            from .views import generate_embedding, cosine_similarity, send_match_notification
-        except Exception:
-            return
-
-        if not found.image:
+        if not AI_AVAILABLE or not found.image:
             return
 
         found_embedding = generate_embedding(found.image)
@@ -134,8 +117,8 @@ class FoundProductViewSet(viewsets.ModelViewSet):
             MatchResult.objects.create(
                 lost_product=lost,
                 found_product=found,
-                lost_embedding=lost_embedding if lost_embedding else b'',
-                found_embedding=found_embedding if found_embedding else b'',
+                lost_embedding=lost_embedding or b'',
+                found_embedding=found_embedding or b'',
                 similarity_score=similarity,
                 match_status=status_str,
             )
@@ -162,3 +145,20 @@ class RouteMapViewSet(viewsets.ModelViewSet):
     queryset = RouteMap.objects.all()
     serializer_class = RouteMapSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+# DRF router setup
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+# Make sure ProfileViewSet/UserProfileViewSet are imported properly from another file
+# router.register(r'profiles', ProfileViewSet)
+# router.register(r'userprofiles', UserProfileViewSet)
+
+urlpatterns = router.urls
+router.register(r'lost-products', LostProductViewSet, basename='lostproduct')
+router.register(r'found-products', FoundProductViewSet, basename='foundproduct')
+router.register(r'match-results', MatchResultViewSet, basename='matchresult')
+router.register(r'notifications', NotificationViewSet, basename='notification')
+router.register(r'route-maps', RouteMapViewSet, basename='routemap')
+urlpatterns += router.urls

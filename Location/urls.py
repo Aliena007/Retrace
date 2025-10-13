@@ -14,12 +14,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
+
 from django.urls import path, include
-from AI.views import home
+from rest_framework.routers import DefaultRouter
+from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', home, name='home'),
-    path('ai/', include('AI.urls')),
+    path('locations/', views.location_list, name='location_list'),
+    path('locations/<int:pk>/', views.location_detail, name='location-detail'),
+    path('locations/create/', views.location_create, name='location-create'),
+    path('locations/<int:pk>/update/', views.location_update, name='location-update'),
+    path('locations/<int:pk>/delete/', views.location_delete, name='location-delete'),
+    path('locations/<int:pk>/settings/', views.location_settings, name='location-settings-update'),
+    # path('locations/<int:pk>/reports/', views.location_report, name='location-reports'),  # Removed duplicate/conflicting route
 ]

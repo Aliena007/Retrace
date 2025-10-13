@@ -10,4 +10,5 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('token/', CustomObtainAuthToken.as_view(), name='token'),
     path('', include(router.urls)),
+
 ]

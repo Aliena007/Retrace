@@ -8,13 +8,13 @@
     padding: 10px 20px;
 }
 .header-text {
-    position: left;
-      top: 20px;
-      right: 20px;
-      width: 250px;
-      height: auto;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 250px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 .header-link {
     text-decoration: none;

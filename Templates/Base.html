@@ -1,48 +1,26 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en">  
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Lost & Found{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    {% block extra_head %}{% endblock %}
-</head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="{% static 'Retrace-removebg-preview (1).png' %}">
+  <link rel="stylesheet" href="{% static 'Style.CSS' %}">
+  <title>{% block title %}Retrace{% endblock %}</title>
+  {% block extra_head %}{% endblock %}
+</head>   
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'home' %}">Retrace</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="{% url 'About' %}">About</a></li>
-       <li class="nav-item"><a class="nav-link" href="{% url 'products' %}">Products</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'report_lost' %}">Report Lost</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'report_found' %}">Report Found</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-      </ul>
-    </div>
+<header class="header">
+  <div class="header-container">
+    <img src="{% static 'Retrace 1.png' %}" alt="Retrace" class="header-text">
+  <div >
+    <a href="{% url 'home' %}" class="header-link">Home</a>
   </div>
-</nav>
-
-<div class="container mt-4">
-    {% if messages %}
-        {% for message in messages %}
-        <img src="{% static 'images/Retrace.png' %}"/>
-
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-    {% block content %}{% endblock %}
-</div>
-
-<footer class="bg-light text-center py-3 mt-4">
-    &copy; 2025 Lost & Found. All Rights Reserved.
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-{% block extra_js %}{% endblock %}
+</header>
+  </div>  
+  <footer>
+    <p>&copy; 2025 Retrace. All rights reserved.</p>
+  </footer>
+{% block content %}{% endblock %}
 </body>
 </html>

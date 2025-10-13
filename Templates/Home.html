@@ -1,29 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="Retrace-removebg-preview (1).png">
-  <link rel="stylesheet" href="Style.CSS">
-  <title>Retrace</title>
-</head>
-<body>
-<header class="header">
-  <div class="header-container">
-    <img src="Retrace 1.png" alt="Retrace" class="header-text">
-  <div >
-    <a href="home" class="header-link">Home</a>
-    <a href="about" class="header-link">About</a>
-    <a href="contact" class="header-link">Contact</a>
-    <a href="Login.html" class="header-link">Login</a>
-  </div>
-  </div>  
-</header>
+{% extends 'Base.html' %}
+{% block title %}Home - Retrace{% endblock %}
+{% block content %}
 <section class="hero">
   <div class="hero-content">
     <h1 class="hero-title">Welcome to Retrace</h1>
     <p class="hero-subtitle">Lost? Let's Retrace.</p>
   </div>
 </section>
-</body>
-</html>
+<section class="features">
+  <div class="feature">
+    <h2 class="feature-title">Feature 1</h2>
+    <p class="feature-description">Description of Feature 1.</p>
+  </div>
+  <div class="feature">
+    <h2 class="feature-title">Feature 2</h2>
+    <p class="feature-description">Description of Feature 2.</p>
+  </div>
+  <div class="feature">
+    <h2 class="feature-title">Feature 3</h2>
+    <p class="feature-description">Description of Feature 3.</p>
+  </div>
+</section>
+{% endblock %}

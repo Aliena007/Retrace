@@ -1,70 +1,70 @@
 from django.db import models
-from django.contrib.auth.models import User
 
+# Create your models here.
+class AImodels(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+route_data = models.JSONField(blank=True, null=True)
+route_data = models.JSONField(blank=True, null=True)
+route_data = models.JSONField(blank=True, null=True)
+route_data = models.JSONField(blank=True, null=True)
+route_data = models.JSONField(blank=True, null=True)
+route_data = models.JSONField(blank=True, null=True)
+
+def __str__(self):
+        return self.name
 class LostProduct(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="lost_items")
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to="lost_product_images/", null=True, blank=True)
-    email = models.EmailField(max_length=254, blank=True, null=True)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)  # last seen location
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
+    description = models.TextField()
+    date_lost = models.DateField()
+    location_lost = models.CharField(max_length=255)
+    contact_info = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='lost_products/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Lost: {self.name} ({self.user.username})"
-
+        return self.name        
 class FoundProduct(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="found_items")
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to="found_product_images/", null=True, blank=True)
-    email = models.EmailField(max_length=254, blank=True, null=True)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)  # found location
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
+    description = models.TextField()
+    date_found = models.DateField()
+    location_found = models.CharField(max_length=255)
+    contact_info = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='found_products/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Found: {self.name} ({self.user.username})"
-
+        return self.name
 class MatchResult(models.Model):
+    id = models.AutoField(primary_key=True)
     lost_product = models.ForeignKey(LostProduct, on_delete=models.CASCADE)
     found_product = models.ForeignKey(FoundProduct, on_delete=models.CASCADE)
-    lost_embedding = models.BinaryField()   # store vector embeddings for AI image comparison
-    found_embedding = models.BinaryField()
-    similarity_score = models.FloatField()
-    threshold_used = models.FloatField(default=0.8)
-    match_status = models.CharField(
-        max_length=20,
-        choices=[("Matched", "Matched"), ("Not Matched", "Not Matched")],
-    )
-    notified_users = models.BooleanField(default=False)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    match_score = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Match: {self.lost_product.name} ↔ {self.found_product.name} [{self.match_status}]"
-
+        return f"Match {self.id}: {self.lost_product.name} - {self.found_product.name}"
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    id = models.AutoField(primary_key=True)
+    user_contact = models.CharField(max_length=255)
     message = models.TextField()
-    sent_via = models.CharField(
-        max_length=20,
-        choices=[("Email", "Email"), ("SMS", "SMS"), ("WhatsApp", "WhatsApp")]
-    )
-    is_sent = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Notification to {self.user.username} ({self.sent_via})"
-
+        return f"Notification {self.id} to {self.user_contact}"
 class RouteMap(models.Model):
-    product = models.ForeignKey(LostProduct, on_delete=models.CASCADE, related_name="routes")
-    route_data = models.JSONField(blank=True, null=True)  
+    id = models.AutoField(primary_key=True)
+    lost_product = models.ForeignKey(LostProduct, on_delete=models.CASCADE)
+    found_product = models.ForeignKey(FoundProduct, on_delete=models.CASCADE)
+    route_data = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Route Map for {self.product.name}"
+        return f"RouteMap {self.id} for {self.lost_product.name} to {self.found_product.name}"
