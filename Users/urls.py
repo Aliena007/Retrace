@@ -12,7 +12,7 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('token/', CustomObtainAuthToken.as_view(), name='token'),
     # Removed Login view
-    path('Register/', views.register1, name='Register'),
+    # Removed Register view
     path('Base/', views.home, name='Home'),
     path('Profile/', views.user_profile, name='UserProfile'),
     path('', include(router.urls)),
