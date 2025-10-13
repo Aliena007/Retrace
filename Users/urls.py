@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from .import views
+# Views import removed - using API-only routes
 from .api_views import RegisterView, CustomObtainAuthToken, ProfileUserViewSet, UserProfileViewSet
 
 router = DefaultRouter()
