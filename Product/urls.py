@@ -29,7 +29,8 @@ router.register(r'notifications', NotificationViewSet, basename='notifications')
 router.register(r'routes', RouteMapViewSet, basename='routes')
 
 urlpatterns = [
-    path('report_lost/', views.report_lost, name='report_lost'),
-    path('report_found/', views.report_found, name='report_found'),
+    path('reportLI/', views.reportLI, name='Report_lost'),
+    path('reportFI/', views.reportFI, name='Report_found'),
+    path('recent/', views.recent, name='Product'),
     path('api/ai/', include(router.urls))
 ]

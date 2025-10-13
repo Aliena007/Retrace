@@ -14,10 +14,10 @@ def Login(request):
                 login(request, user)
                 return redirect('home')
             else:
-                return render(request, 'login.html', {'error': 'Invalid credentials'})
+                return render(request, 'login1.html', {'error': 'Invalid credentials'})
         else:
-            return render(request, 'login.html', {'error': 'Please provide both username and password'})
-    return render(request, 'login.html')
+            return render(request, 'login1.html', {'error': 'Please provide both username and password'})
+    return render(request, 'login1.html')
 
 def Register(request):
     if request.method == 'POST':
@@ -32,7 +32,10 @@ def Home(request):
     return render(request, 'Base.html')
 
 def UserProfile(request):
-    return render(request, 'user_profile.html')
+    if request.user.is_authenticated:
+        return render(request, 'user_profile.html')
     return render(request, 'Base.html','Style.css')
 def UserProfile(request):
+    if request.user.is_authenticated:
+        return render(request, 'user_profile.html','Style.css')
     return render(request, 'user_profile.html','Style.css')

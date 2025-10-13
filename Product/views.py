@@ -42,5 +42,5 @@ def report_found(request):
         return render(request, 'reportFI.html', {'error': 'Please fill in all required fields.'})
         return render(request, 'reportFI.html') 
 def Product(request):
-    return render(request, 'reportFI.html', {'style': 'Style.css'})
+    return render(request, 'recent.html', {'style': 'Style.css'})
 
