@@ -135,10 +135,7 @@ class MatchResultViewSet(viewsets.ReadOnlyModelViewSet):
 class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class RouteMapViewSet(viewsets.ModelViewSet):
