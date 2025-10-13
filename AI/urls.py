@@ -10,11 +10,4 @@ router.register(r'matches', MatchResultViewSet, basename='matches')
 router.register(r'notifications', NotificationViewSet, basename='notifications')
 router.register(r'routes', RouteMapViewSet, basename='routes')
 
-urlpatterns = [
-    path('api/ai/', include(router.urls)),
-    path('home/', views.home, name='home'),
-    path('', views.home, name='home'),
-    path('add_found_product/', views.add_found_product, name='add_found_product'),
-    path('add_lost_product/', views.add_lost_product, name='add_lost_product'),
-    
-]
+urlpatterns = router.urls
