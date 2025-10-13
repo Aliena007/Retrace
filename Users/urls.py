@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from Retrace.Product import views
+from .import views
 from .api_views import RegisterView, CustomObtainAuthToken, ProfileUserViewSet, UserProfileViewSet
 
 router = DefaultRouter()
