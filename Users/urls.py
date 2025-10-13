@@ -14,7 +14,7 @@ urlpatterns = [
     # Removed Login view
     # Removed Register view
     # Removed Base view
-    path('Profile/', views.user_profile, name='UserProfile'),
+    # Removed Profile view
     path('', include(router.urls)),
 
 ]
