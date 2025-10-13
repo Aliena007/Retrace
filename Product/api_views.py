@@ -24,7 +24,7 @@ class LostProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        lost = serializer.save(user=self.request.user)
+        lost = serializer.save()
         from django.conf import settings
         if getattr(settings, 'CELERY_ENABLED', False):
             try:
