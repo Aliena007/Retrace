@@ -23,7 +23,7 @@ except Exception:
 class LostProductViewSet(viewsets.ModelViewSet):
     queryset = LostProduct.objects.all()
     serializer_class = LostProductSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = []  # Open access
 
     def perform_create(self, serializer):
         lost = serializer.save()
