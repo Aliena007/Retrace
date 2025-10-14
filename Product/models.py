@@ -70,6 +70,7 @@ class FoundProduct(models.Model):
     report_date = models.DateTimeField(auto_now_add=True)
     additional_info = models.TextField(blank=True, null=True)
 
+
     def __str__(self) -> str:
         return f"Found Report for {self.product.name} by {self.reporter_name}"
     

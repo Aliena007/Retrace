@@ -3,6 +3,7 @@ from email.mime import image
 from os import name
 from django.http import HttpResponse
 from django.shortcuts import render
+from .models import Notification,RouteMap,MatchResult,FoundProduct,LostProduct,ProductImage,Product
 
 # Create your views here.
 def report_lost(request):
@@ -23,6 +24,8 @@ def report_lost(request):
     else:
         return render(request, 'Lost_product.html', {'error': 'Please fill in all required fields.'})
         return render(request, 'Lost_product.html')
+    a=LostProduct(name=name, description=description,status=status,category=category,image=image, location=location,date_reported=date_reported,reporter_contact=reporter_contact,email=email)
+    a.save()
 def report_found(request):
     name = request.POST.get("Product name")
     description = request.POST.get("Description")
@@ -41,6 +44,8 @@ def report_found(request):
     else:
         return render(request, 'Found_product.html', {'error': 'Please fill in all required fields.'})
         return render(request, 'Found_product.html') 
+    b=FoundProduct(name=name, description=description,status=status,category=category,image=image, location=location,date_reported=date_reported,reporter_contact=reporter_contact,email=email)
+    b.save()
 def Product(request):
     return render(request, 'Dashboard.html', {'style': 'Style.css'})
 
