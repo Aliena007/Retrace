@@ -27,6 +27,32 @@ class LostProductViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         lost = serializer.save()
+        
+        # AI Image Analysis
+        if lost.image:
+            try:
+                from emergentintegrations.llm_with_image import call_llm_with_image
+                import os
+                
+                api_key = os.getenv('EMERGENT_LLM_KEY')
+                if api_key:
+                    image_path = lost.image.path
+                    prompt = f"Analyze this lost item image and provide: 1) Detailed description 2) Key identifying features 3) Category (electronics, clothing, accessories, books, etc.)"
+                    
+                    result = call_llm_with_image(
+                        prompt=prompt,
+                        file_paths=[image_path],
+                        api_key=api_key,
+                        model="gpt-4o"
+                    )
+                    
+                    if result:
+                        # Update description with AI analysis
+                        ai_description = f"AI Analysis: {result}\n\nOriginal: {lost.description}"
+                        lost.description = ai_description[:1000]  # Limit length
+                        lost.save()
+            except Exception as e:
+                print(f"AI analysis error: {e}")
 
         if getattr(settings, 'CELERY_ENABLED', False):
             try:
