@@ -180,7 +180,7 @@ class MatchResultViewSet(viewsets.ReadOnlyModelViewSet):
 class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = []  # Open access
 
 
 class RouteMapViewSet(viewsets.ModelViewSet):
