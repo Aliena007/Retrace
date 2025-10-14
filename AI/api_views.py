@@ -37,7 +37,7 @@ class LostProductViewSet(viewsets.ModelViewSet):
                 api_key = os.getenv('EMERGENT_LLM_KEY')
                 if api_key:
                     image_path = lost.image.path
-                    prompt = f"Analyze this lost item image and provide: 1) Detailed description 2) Key identifying features 3) Category (electronics, clothing, accessories, books, etc.)"
+                    prompt = "Analyze this lost item image and provide: 1) Detailed description 2) Key identifying features 3) Category (electronics, clothing, accessories, books, etc.)"
                     
                     result = call_llm_with_image(
                         prompt=prompt,
