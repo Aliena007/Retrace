@@ -1,39 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="Retrace-removebg-preview (1).png">
-  <link rel="stylesheet" href="Style.CSS">
-  <title>Retrace</title>
-</head>
-<body>
-    <header class="header">
-      <div class="header-container">
-        <img src="Retrace 1.png" alt="Retrace" class="header-text">
-        <div >
-    <a href="Home.html" class="header-link">Home</a>
-    <a href="About.html" class="header-link">About</a>
-    <a href="Contact.html" class="header-link">Contact</a>
-    <a href="Login.html" class="header-link">Login</a>
-  </div>
-      </div>
-      </header>
-      <section class="login-section">   
-        <div class="bg-img">
-            <form action="/action_page.php" class="container">
-            <h1>Login</h1>
-
-         <label for="email"><b>Email</b></label>
-            <input type="text" placeholder="Enter Email" name="email" required>
-
-          <label for="psw"><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="psw" required>
-
+<section class="auth-form">
+    <h2>Login</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Email:</label>
+        <input type="email" name="email" required>
+        <label>Password:</label>
+        <input type="password" name="password" required>
         <button type="submit" class="btn">Login</button>
-  </form>
-</div>
-</body>
+    </form>
+    <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+</section>
 {% endblock %}
