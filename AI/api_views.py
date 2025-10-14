@@ -121,6 +121,25 @@ class FoundProductViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         found = serializer.save()
+        
+        # AI Image Analysis
+        if found.image:
+            try:
+                from emergentintegrations.llm_with_image import call_llm_with_image
+                import os
+                
+                api_key = os.getenv('EMERGENT_LLM_KEY')
+                if api_key:
+                    result = call_llm_with_image(
+                        prompt="Analyze this found item and provide: 1) Description 2) Key features 3) Category",
+                        file_paths=[found.image.path],
+                        api_key=api_key,
+                        model="gpt-4o"
+                    )
+                    if result:
+                        found.description = f"AI: {result}\n\nOriginal: {found.description}"[:1000]
+                        found.save()
+            except: pass
 
         if getattr(settings, 'CELERY_ENABLED', False):
             try:
