@@ -186,7 +186,7 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
 class RouteMapViewSet(viewsets.ModelViewSet):
     queryset = RouteMap.objects.all()
     serializer_class = RouteMapSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = []  # Open access
 
 
 # DRF router setup
