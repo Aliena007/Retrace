@@ -117,7 +117,7 @@ class LostProductViewSet(viewsets.ModelViewSet):
 class FoundProductViewSet(viewsets.ModelViewSet):
     queryset = FoundProduct.objects.all()
     serializer_class = FoundProductSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = []  # Open access
 
     def perform_create(self, serializer):
         found = serializer.save()
