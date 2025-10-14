@@ -83,7 +83,7 @@ class LostProductViewSet(viewsets.ModelViewSet):
             if status_str == "Matched":
                 send_match_notification(lost, found)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post'])  # Open access
     def match(self, _request, _pk=None):
         lost = self.get_object()
 
