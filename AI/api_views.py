@@ -174,7 +174,7 @@ class FoundProductViewSet(viewsets.ModelViewSet):
 class MatchResultViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = MatchResult.objects.all()
     serializer_class = MatchResultSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = []  # Open access
 
 
 class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
