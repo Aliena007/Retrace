@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import LostProduct, FoundProduct, MatchResult, Notification, RouteMap
 
+<<<<<<< HEAD
 try:
     from PIL import Image
     import torch
@@ -54,6 +55,31 @@ def get_model():
             return None, None, None
             
     return _resnet_model, _preprocess, _device
+=======
+from PIL import Image
+import torch
+import torchvision.transforms as transforms
+import torchvision.models as models
+from torchvision.models import ResNet18_Weights
+
+# -------------------- Setup model (CPU/GPU) --------------------
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# Use a pre-trained ResNet18 for image embeddings
+resnet_model = models.resnet18(weights=ResNet18_Weights.DEFAULT)
+resnet_model = torch.nn.Sequential(*list(resnet_model.children())[:-1])  # Remove final classifier
+resnet_model = resnet_model.to(device)
+resnet_model.eval()
+
+# Preprocessing for ResNet
+preprocess = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
+])
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
 # -------------------- Helper functions ------------------------
 def generate_embedding(image_field):
@@ -61,6 +87,7 @@ def generate_embedding(image_field):
     if not image_field:
         return None
     
+<<<<<<< HEAD
     resnet_model, preprocess, device = get_model()
     if resnet_model is None:
         return None
@@ -77,6 +104,16 @@ def generate_embedding(image_field):
     except Exception as e:
         print(f"Error generating embedding: {e}")
         return None
+=======
+    image = Image.open(image_field).convert("RGB")
+    image_tensor = preprocess(image).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        embedding = resnet_model(image_tensor)  # shape: [1, 512, 1, 1]
+    
+    embedding = embedding.squeeze().cpu().numpy()  # shape: [512]
+    return embedding.astype(np.float32).tobytes()
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
 
 def cosine_similarity(vec1, vec2):
@@ -94,6 +131,7 @@ def add_lost_product(request):
         email = request.POST.get("email")
         location = request.POST.get("location")
 
+<<<<<<< HEAD
         # Create lost product with user if authenticated
         lost_data = {
             'name': name,
@@ -106,10 +144,21 @@ def add_lost_product(request):
             lost_data['user'] = request.user
         
         lost = LostProduct.objects.create(**lost_data)
+=======
+        lost = LostProduct.objects.create(
+            user=request.user,
+            name=name,
+            description=description,
+            image=image,
+            email=email,
+            location=location,
+        )
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
         # Generate embedding
         lost_embedding = generate_embedding(image)
         
+<<<<<<< HEAD
         if lost_embedding is not None:
             # Compare with all found products
             found_products = FoundProduct.objects.all()
@@ -133,6 +182,29 @@ def add_lost_product(request):
                             send_match_notification(lost, found)
 
         return redirect("home")  # Redirect to home since lost_detail might not exist
+=======
+        # Compare with all found products
+        found_products = FoundProduct.objects.all()
+        for found in found_products:
+            if found.image:
+                found_embedding = generate_embedding(found.image)
+                similarity = cosine_similarity(lost_embedding, found_embedding)
+
+                match_status = "Matched" if similarity >= 0.8 else "Not Matched"
+                match = MatchResult.objects.create(
+                    lost_product=lost,
+                    found_product=found,
+                    lost_embedding=lost_embedding,
+                    found_embedding=found_embedding,
+                    similarity_score=similarity,
+                    match_status=match_status,
+                )
+
+                if match_status == "Matched":
+                    send_match_notification(lost, found)
+
+        return redirect("lost_detail", pk=lost.pk)
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
     return render(request, "add_lost_product.html")
 
@@ -146,6 +218,7 @@ def add_found_product(request):
         email = request.POST.get("email")
         location = request.POST.get("location")
 
+<<<<<<< HEAD
         # Create found product with user if authenticated
         found_data = {
             'name': name,
@@ -158,10 +231,21 @@ def add_found_product(request):
             found_data['user'] = request.user
         
         found = FoundProduct.objects.create(**found_data)
+=======
+        found = FoundProduct.objects.create(
+            user=request.user,
+            name=name,
+            description=description,
+            image=image,
+            email=email,
+            location=location,
+        )
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
         # Generate embedding
         found_embedding = generate_embedding(image)
 
+<<<<<<< HEAD
         if found_embedding is not None:
             # Compare with all lost products
             lost_products = LostProduct.objects.all()
@@ -185,6 +269,29 @@ def add_found_product(request):
                             send_match_notification(lost, found)
 
         return redirect("home")  # Redirect to home since found_detail might not exist
+=======
+        # Compare with all lost products
+        lost_products = LostProduct.objects.all()
+        for lost in lost_products:
+            if lost.image:
+                lost_embedding = generate_embedding(lost.image)
+                similarity = cosine_similarity(lost_embedding, found_embedding)
+
+                match_status = "Matched" if similarity >= 0.8 else "Not Matched"
+                match = MatchResult.objects.create(
+                    lost_product=lost,
+                    found_product=found,
+                    lost_embedding=lost_embedding,
+                    found_embedding=found_embedding,
+                    similarity_score=similarity,
+                    match_status=match_status,
+                )
+
+                if match_status == "Matched":
+                    send_match_notification(lost, found)
+
+        return redirect("found_detail", pk=found.pk)
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
     return render(request, "add_found_product.html")
 
@@ -197,6 +304,7 @@ def send_match_notification(lost, found):
         f"Good news! Your lost item '{lost.name}' might match with a found item.\n\n"
         f"Found item: {found.name}\n"
         f"Description: {found.description}\n"
+<<<<<<< HEAD
         f"Location: {found.location or 'Not specified'}\n"
         f"Contact: {found.email or 'Not provided'}"
     )
@@ -223,6 +331,21 @@ def send_match_notification(lost, found):
         Notification.objects.create(**notification_data)
     except Exception as e:
         print(f"Failed to create notification: {e}")
+=======
+        f"Location: {found.location}\n"
+        f"Contact: {found.email}"
+    )
+    recipient = lost.email
+
+    if recipient:
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient])
+        Notification.objects.create(
+            user=lost.user,
+            message=message,
+            sent_via="Email",
+            is_sent=True,
+        )
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
 
 # -------------------- Route Map (Stub) -----------------------
@@ -239,11 +362,17 @@ def generate_route(request, lost_id):
         ],
     }
     # ===================== Home View =====================
+<<<<<<< HEAD
+=======
+from django.shortcuts import render
+
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 def home(request):
     # You can pass any context, e.g., route_data
     route_data = {}  # or precompute as needed
     return render(request, "Home.html", {"route_data": route_data})
 
+<<<<<<< HEAD
 # ===================== Redirect View for Legacy URLs =====================
 def redirect_home(request):
     """Handle legacy .html URLs and redirect to proper Django URLs"""
@@ -492,3 +621,6 @@ def search_items(request):
     return render(request, "Search_dashboard.html", context)
 
     return render(request, "Found_product.html")
+=======
+    return JsonResponse(route_data, safe=False)
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e

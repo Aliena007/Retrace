@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+<<<<<<< HEAD
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -8,17 +9,27 @@ from django.conf import settings
 from django.utils import timezone
 from AI.models import LostProduct, FoundProduct, Notification
 from .models import PasswordResetOTP
+=======
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
 # Create your views here.
 def Login(request):
     if request.method == 'POST':
+<<<<<<< HEAD
         username = request.POST.get("Username")  # Match template field name
         password = request.POST.get("Password")  # Match template field name
+=======
+        username = request.POST.get("Username")
+        password = request.POST.get("Password")
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
         if username and password:
             # Authenticate user
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
+<<<<<<< HEAD
                 return redirect('dashboard')  # Redirect to dashboard instead of home
             else:
                 messages.error(request, 'Invalid credentials')
@@ -26,10 +37,18 @@ def Login(request):
         else:
             messages.error(request, 'Please provide both username and password')
             return render(request, 'Login.html')
+=======
+                return redirect('home')
+            else:
+                return render(request, 'Login.html', {'error': 'Invalid credentials'})
+        else:
+            return render(request, 'Login.html', {'error': 'Please provide both username and password'})
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
     return render(request, 'Login.html')
 
 def Register(request):
     if request.method == 'POST':
+<<<<<<< HEAD
         username = request.POST.get("username")
         email = request.POST.get("email")
         password1 = request.POST.get("password1")
@@ -104,10 +123,22 @@ def Dashboard(request):
     }
     
     return render(request, 'Dashboard.html', context)
+=======
+        username = request.POST.get("Username")
+        password = request.POST.get("Password")
+        if username and password:
+            # Create new user
+            user = User.objects.create_user(username=username, password=password)
+            login(request, user)
+            return render('Register.html')
+def Home(request):
+    return render(request, 'Base.html')
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
 def UserProfile(request):
     if request.user.is_authenticated:
         return render(request, 'Profile.html')
+<<<<<<< HEAD
     return redirect('Login')
 
 def About(request):
@@ -395,3 +426,10 @@ def ResetPassword(request):
             return render(request, 'Reset_password.html', {'email': email})
     
     return render(request, 'Reset_password.html', {'email': email})
+=======
+    return render(request, 'Base.html','Style.css')
+def UserProfile(request):
+    if request.user.is_authenticated:
+        return render(request, 'Profile.html','Style.css')
+    return render(request, 'Profile.html','Style.css')
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e

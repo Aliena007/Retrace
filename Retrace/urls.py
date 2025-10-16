@@ -16,15 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+<<<<<<< HEAD
 from django.conf import settings
 from django.conf.urls.static import static
 from AI.views import home, redirect_home
+=======
+from AI.views import home
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
     path('ai/', include('AI.urls')),
     path('Product/', include('Product.urls')),
+<<<<<<< HEAD
     path('Users/', include('Users.urls')),
     path('users/', include('Users.urls')),  # Add lowercase version for user convenience
     path('Location/', include('Location.urls')),
@@ -40,3 +45,9 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+=======
+    path('AI/', include('AI.urls')),
+    path('Users/', include('Users.urls')),
+    path('Location/', include('Location.urls')),
+]
+>>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
