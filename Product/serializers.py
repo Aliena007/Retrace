@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from rest_framework import serializers
 from .models import LostProduct, FoundProduct, MatchResult, Notification, RouteMap
 
@@ -33,7 +33,7 @@ class RouteMapSerializer(serializers.ModelSerializer):
     class Meta:
         model = RouteMap
         fields = ['id', 'product', 'route_data', 'created_at']
-=======
+
 from rest_framework import serializers
 from .models import LostProduct, FoundProduct, MatchResult, Notification, RouteMap
 
@@ -68,4 +68,4 @@ class RouteMapSerializer(serializers.ModelSerializer):
     class Meta:
         model = RouteMap
         fields = ['id', 'product', 'route_data', 'created_at']
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+

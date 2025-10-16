@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
@@ -27,21 +27,4 @@ urlpatterns = [
     path('contact/', views.Contact, name='contact'),
     path('', include(router.urls)),
 ]
-=======
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
-from .import views
-from .api_views import RegisterView, CustomObtainAuthToken, ProfileUserViewSet, UserProfileViewSet
-
-router = DefaultRouter()
-router.register(r'profiles', ProfileUserViewSet, basename='profileuser')
-router.register(r'userprofiles', UserProfileViewSet, basename='userprofile')
-
-urlpatterns = [
-    path('register/', RegisterView.as_view(), name='register'),
-    path('token/', CustomObtainAuthToken.as_view(), name='token'),
-    path('', include(router.urls)),
-
-]
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e

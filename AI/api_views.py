@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -163,7 +163,7 @@ router.register(r'route-maps', RouteMapViewSet, basename='routemap')
 # router.register(r'userprofiles', UserProfileViewSet)
 
 urlpatterns = router.urls
-=======
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -328,4 +328,4 @@ router.register(r'match-results', MatchResultViewSet, basename='matchresult')
 router.register(r'notifications', NotificationViewSet, basename='notification')
 router.register(r'route-maps', RouteMapViewSet, basename='routemap')
 urlpatterns += router.urls
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+

@@ -125,19 +125,16 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-<<<<<<< HEAD
+
 
 # Media files (uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-=======
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-<<<<<<< HEAD
 
 # Email Configuration for OTP and password reset
 import os
@@ -162,5 +159,5 @@ else:
 
 DEFAULT_FROM_EMAIL = 'noreply@retrace.com'
 EMAIL_SUBJECT_PREFIX = '[Retrace] '
-=======
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+
+

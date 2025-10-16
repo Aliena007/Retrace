@@ -1,12 +1,5 @@
 from django.db import models
-<<<<<<< HEAD
-=======
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from django.conf import settings
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+
 
 # Create your models here.
 class Product(models.Model):
@@ -46,8 +39,7 @@ class ProductImage(models.Model):
         verbose_name = 'Product Image'
         verbose_name_plural = 'Product Images'
         ordering = ['-uploaded_at']
-<<<<<<< HEAD
-=======
+
 
 class LostProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='lost_reports')
@@ -125,4 +117,4 @@ class RouteMap(models.Model):
         verbose_name = 'Product Route Map'
         verbose_name_plural = 'Product Route Maps'
         ordering = ['-created_at']
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+

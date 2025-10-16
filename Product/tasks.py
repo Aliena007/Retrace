@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 try:
     from celery import shared_task
 except Exception:
@@ -69,7 +69,7 @@ def run_match_for_item(item_type, item_id):
             )
             if status_str == "Matched":
                 send_match_notification(lost, found)
-=======
+
 try:
     from celery import shared_task
 except Exception:
@@ -140,4 +140,4 @@ def run_match_for_item(item_type, item_id):
             )
             if status_str == "Matched":
                 send_match_notification(lost, found)
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+

@@ -1,11 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User as Users
-<<<<<<< HEAD
+
 from django.utils import timezone
 import random
 import string
-=======
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
 # Create your models here.
 class User(models.Model):
@@ -78,7 +76,7 @@ class UserSettings(models.Model):
         ordering = ['-created_at']  
         verbose_name = 'User Setting'
         verbose_name_plural = 'User Settings'
-<<<<<<< HEAD
+
 
 
 class PasswordResetOTP(models.Model):
@@ -120,5 +118,4 @@ class PasswordResetOTP(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Password Reset OTP'
         verbose_name_plural = 'Password Reset OTPs'
-=======
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+

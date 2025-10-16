@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -43,7 +43,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-=======
+
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -88,4 +88,4 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+

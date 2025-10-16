@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -103,7 +103,7 @@ def report_found(request):
             messages.error(request, f"Error saving report: {str(e)}")
             return render(request, 'Found_product.html')
 
-=======
+
 import email
 from email.mime import image
 from os import name
@@ -152,7 +152,7 @@ def report_found(request):
         return render(request, 'Found_product.html') 
     b=FoundProduct(name=name, description=description,status=status,category=category,image=image, location=location,date_reported=date_reported,reporter_contact=reporter_contact,email=email)
     b.save()
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+
 def Product(request):
     return render(request, 'Dashboard.html', {'style': 'Style.css'})
 

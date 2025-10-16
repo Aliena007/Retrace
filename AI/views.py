@@ -1,128 +1,98 @@
 ## ========================== views.py ==========================
+"""AI app views - cleaned and merged.
+
+This module contains Django views for reporting lost/found items, matching using
+an optional ResNet18 embedding model, notification creation, and simple search
+and routing helpers.
+"""
+
 import io
 import numpy as np
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
 
 from .models import LostProduct, FoundProduct, MatchResult, Notification, RouteMap
 
-<<<<<<< HEAD
+
+# Try to import torch and torchvision; code should continue working if not installed.
 try:
     from PIL import Image
+except Exception:
+    Image = None
+
+try:
     import torch
     import torchvision.transforms as transforms
     import torchvision.models as models
     from torchvision.models import ResNet18_Weights
     TORCH_AVAILABLE = True
-except ImportError:
+except Exception:
     TORCH_AVAILABLE = False
+
 
 # -------------------- Lazy model loading --------------------
 _resnet_model = None
 _preprocess = None
 _device = None
 
+
 def get_model():
-    """Lazy loading of the ResNet model to avoid startup delays."""
+    """Return (model, preprocess, device) or (None, None, None) if torch not present."""
     global _resnet_model, _preprocess, _device
-    
     if not TORCH_AVAILABLE:
         return None, None, None
-    
     if _resnet_model is None:
         try:
             _device = "cuda" if torch.cuda.is_available() else "cpu"
-            
-            # Use a pre-trained ResNet18 for image embeddings
             _resnet_model = models.resnet18(weights=ResNet18_Weights.DEFAULT)
-            _resnet_model = torch.nn.Sequential(*list(_resnet_model.children())[:-1])  # Remove final classifier
+            _resnet_model = torch.nn.Sequential(*list(_resnet_model.children())[:-1])
             _resnet_model = _resnet_model.to(_device)
             _resnet_model.eval()
-
-            # Preprocessing for ResNet
             _preprocess = transforms.Compose([
                 transforms.Resize(256),
                 transforms.CenterCrop(224),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                   std=[0.229, 0.224, 0.225])
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             ])
         except Exception as e:
             print(f"Failed to load model: {e}")
             return None, None, None
-            
     return _resnet_model, _preprocess, _device
-=======
-from PIL import Image
-import torch
-import torchvision.transforms as transforms
-import torchvision.models as models
-from torchvision.models import ResNet18_Weights
 
-# -------------------- Setup model (CPU/GPU) --------------------
-device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Use a pre-trained ResNet18 for image embeddings
-resnet_model = models.resnet18(weights=ResNet18_Weights.DEFAULT)
-resnet_model = torch.nn.Sequential(*list(resnet_model.children())[:-1])  # Remove final classifier
-resnet_model = resnet_model.to(device)
-resnet_model.eval()
-
-# Preprocessing for ResNet
-preprocess = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                         std=[0.229, 0.224, 0.225])
-])
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
-
-# -------------------- Helper functions ------------------------
 def generate_embedding(image_field):
-    """Convert uploaded image to vector embedding using ResNet18."""
-    if not image_field:
+    """Convert uploaded image to vector embedding using ResNet18.
+
+    Returns raw bytes of float32 vector or None on failure / when model unavailable.
+    """
+    if not image_field or not TORCH_AVAILABLE or Image is None:
         return None
-    
-<<<<<<< HEAD
-    resnet_model, preprocess, device = get_model()
-    if resnet_model is None:
+    model, preprocess, device = get_model()
+    if model is None or preprocess is None:
         return None
-    
     try:
         image = Image.open(image_field).convert("RGB")
-        image_tensor = preprocess(image).unsqueeze(0).to(device)
-
+        tensor = preprocess(image).unsqueeze(0).to(device)
         with torch.no_grad():
-            embedding = resnet_model(image_tensor)  # shape: [1, 512, 1, 1]
-        
-        embedding = embedding.squeeze().cpu().numpy()  # shape: [512]
-        return embedding.astype(np.float32).tobytes()
+            emb = model(tensor)
+        emb = emb.squeeze().cpu().numpy()
+        return emb.astype(np.float32).tobytes()
     except Exception as e:
         print(f"Error generating embedding: {e}")
         return None
-=======
-    image = Image.open(image_field).convert("RGB")
-    image_tensor = preprocess(image).unsqueeze(0).to(device)
-
-    with torch.no_grad():
-        embedding = resnet_model(image_tensor)  # shape: [1, 512, 1, 1]
-    
-    embedding = embedding.squeeze().cpu().numpy()  # shape: [512]
-    return embedding.astype(np.float32).tobytes()
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
 
 def cosine_similarity(vec1, vec2):
-    """Cosine similarity between two embeddings."""
     v1 = np.frombuffer(vec1, dtype=np.float32)
     v2 = np.frombuffer(vec2, dtype=np.float32)
-    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+    denom = (np.linalg.norm(v1) * np.linalg.norm(v2))
+    if denom == 0:
+        return 0.0
+    return float(np.dot(v1, v2) / denom)
 
-# -------------------- Lost Product ----------------------------
+
 def add_lost_product(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -131,85 +101,33 @@ def add_lost_product(request):
         email = request.POST.get("email")
         location = request.POST.get("location")
 
-<<<<<<< HEAD
-        # Create lost product with user if authenticated
-        lost_data = {
-            'name': name,
-            'description': description,
-            'image': image,
-            'email': email,
-            'location': location,
-        }
+        lost_data = {'name': name, 'description': description, 'image': image, 'email': email, 'location': location}
         if request.user.is_authenticated:
             lost_data['user'] = request.user
-        
         lost = LostProduct.objects.create(**lost_data)
-=======
-        lost = LostProduct.objects.create(
-            user=request.user,
-            name=name,
-            description=description,
-            image=image,
-            email=email,
-            location=location,
-        )
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
-        # Generate embedding
-        lost_embedding = generate_embedding(image)
-        
-<<<<<<< HEAD
-        if lost_embedding is not None:
-            # Compare with all found products
-            found_products = FoundProduct.objects.all()
-            for found in found_products:
+        lost_emb = generate_embedding(image)
+        if lost_emb is not None:
+            for found in FoundProduct.objects.all():
                 if found.image:
-                    found_embedding = generate_embedding(found.image)
-                    if found_embedding is not None:
-                        similarity = cosine_similarity(lost_embedding, found_embedding)
-
-                        match_status = "Matched" if similarity >= 0.8 else "Not Matched"
-                        match = MatchResult.objects.create(
+                    found_emb = generate_embedding(found.image)
+                    if found_emb is not None:
+                        sim = cosine_similarity(lost_emb, found_emb)
+                        status = "Matched" if sim >= 0.8 else "Not Matched"
+                        MatchResult.objects.create(
                             lost_product=lost,
                             found_product=found,
-                            lost_embedding=lost_embedding,
-                            found_embedding=found_embedding,
-                            similarity_score=similarity,
-                            match_status=match_status,
+                            lost_embedding=lost_emb,
+                            found_embedding=found_emb,
+                            similarity_score=sim,
+                            match_status=status,
                         )
-
-                        if match_status == "Matched":
+                        if status == "Matched":
                             send_match_notification(lost, found)
-
-        return redirect("home")  # Redirect to home since lost_detail might not exist
-=======
-        # Compare with all found products
-        found_products = FoundProduct.objects.all()
-        for found in found_products:
-            if found.image:
-                found_embedding = generate_embedding(found.image)
-                similarity = cosine_similarity(lost_embedding, found_embedding)
-
-                match_status = "Matched" if similarity >= 0.8 else "Not Matched"
-                match = MatchResult.objects.create(
-                    lost_product=lost,
-                    found_product=found,
-                    lost_embedding=lost_embedding,
-                    found_embedding=found_embedding,
-                    similarity_score=similarity,
-                    match_status=match_status,
-                )
-
-                if match_status == "Matched":
-                    send_match_notification(lost, found)
-
-        return redirect("lost_detail", pk=lost.pk)
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
-
+        return redirect('home')
     return render(request, "add_lost_product.html")
 
 
-# -------------------- Found Product ---------------------------
 def add_found_product(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -218,409 +136,190 @@ def add_found_product(request):
         email = request.POST.get("email")
         location = request.POST.get("location")
 
-<<<<<<< HEAD
-        # Create found product with user if authenticated
-        found_data = {
-            'name': name,
-            'description': description,
-            'image': image,
-            'email': email,
-            'location': location,
-        }
+        found_data = {'name': name, 'description': description, 'image': image, 'email': email, 'location': location}
         if request.user.is_authenticated:
             found_data['user'] = request.user
-        
         found = FoundProduct.objects.create(**found_data)
-=======
-        found = FoundProduct.objects.create(
-            user=request.user,
-            name=name,
-            description=description,
-            image=image,
-            email=email,
-            location=location,
-        )
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
-        # Generate embedding
-        found_embedding = generate_embedding(image)
-
-<<<<<<< HEAD
-        if found_embedding is not None:
-            # Compare with all lost products
-            lost_products = LostProduct.objects.all()
-            for lost in lost_products:
+        found_emb = generate_embedding(image)
+        if found_emb is not None:
+            for lost in LostProduct.objects.all():
                 if lost.image:
-                    lost_embedding = generate_embedding(lost.image)
-                    if lost_embedding is not None:
-                        similarity = cosine_similarity(lost_embedding, found_embedding)
-
-                        match_status = "Matched" if similarity >= 0.8 else "Not Matched"
-                        match = MatchResult.objects.create(
+                    lost_emb = generate_embedding(lost.image)
+                    if lost_emb is not None:
+                        sim = cosine_similarity(lost_emb, found_emb)
+                        status = "Matched" if sim >= 0.8 else "Not Matched"
+                        MatchResult.objects.create(
                             lost_product=lost,
                             found_product=found,
-                            lost_embedding=lost_embedding,
-                            found_embedding=found_embedding,
-                            similarity_score=similarity,
-                            match_status=match_status,
+                            lost_embedding=lost_emb,
+                            found_embedding=found_emb,
+                            similarity_score=sim,
+                            match_status=status,
                         )
-
-                        if match_status == "Matched":
+                        if status == "Matched":
                             send_match_notification(lost, found)
-
-        return redirect("home")  # Redirect to home since found_detail might not exist
-=======
-        # Compare with all lost products
-        lost_products = LostProduct.objects.all()
-        for lost in lost_products:
-            if lost.image:
-                lost_embedding = generate_embedding(lost.image)
-                similarity = cosine_similarity(lost_embedding, found_embedding)
-
-                match_status = "Matched" if similarity >= 0.8 else "Not Matched"
-                match = MatchResult.objects.create(
-                    lost_product=lost,
-                    found_product=found,
-                    lost_embedding=lost_embedding,
-                    found_embedding=found_embedding,
-                    similarity_score=similarity,
-                    match_status=match_status,
-                )
-
-                if match_status == "Matched":
-                    send_match_notification(lost, found)
-
-        return redirect("found_detail", pk=found.pk)
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
-
+        return redirect('home')
     return render(request, "add_found_product.html")
 
 
-# -------------------- Notification ----------------------------
 def send_match_notification(lost, found):
-    """Send email notification when a match is found."""
     subject = f"Match Found for {lost.name}!"
     message = (
         f"Good news! Your lost item '{lost.name}' might match with a found item.\n\n"
         f"Found item: {found.name}\n"
         f"Description: {found.description}\n"
-<<<<<<< HEAD
-        f"Location: {found.location or 'Not specified'}\n"
-        f"Contact: {found.email or 'Not provided'}"
+        f"Location: {getattr(found, 'location', 'Not specified')}\n"
+        f"Contact: {getattr(found, 'email', 'Not provided')}"
     )
-    
-    # Send email if we have an email and settings are configured
-    if lost.email and hasattr(settings, 'DEFAULT_FROM_EMAIL'):
+    recipient = getattr(lost, 'email', None)
+    if recipient and getattr(settings, 'DEFAULT_FROM_EMAIL', None):
         try:
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [lost.email])
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient])
         except Exception as e:
             print(f"Failed to send email: {e}")
-
-    # Create notification record
     try:
-        notification_data = {
-            'message': message,
-            'sent_via': "Email",
-            'is_sent': True,
-        }
-        if hasattr(lost, 'user') and lost.user:
-            notification_data['user'] = lost.user
-        else:
-            notification_data['user_contact'] = lost.email or 'Unknown'
-            
-        Notification.objects.create(**notification_data)
+        Notification.objects.create(
+            user=getattr(lost, 'user', None),
+            user_contact=getattr(lost, 'email', None),
+            message=message,
+            sent_via='Email',
+            is_sent=bool(recipient),
+        )
     except Exception as e:
         print(f"Failed to create notification: {e}")
-=======
-        f"Location: {found.location}\n"
-        f"Contact: {found.email}"
-    )
-    recipient = lost.email
-
-    if recipient:
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient])
-        Notification.objects.create(
-            user=lost.user,
-            message=message,
-            sent_via="Email",
-            is_sent=True,
-        )
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
 
 
-# -------------------- Route Map (Stub) -----------------------
 def generate_route(request, lost_id):
     lost = get_object_or_404(LostProduct, pk=lost_id)
-    
     route_data = {
-        "start": {"lat": lost.latitude, "lng": lost.longitude},
-        "end": {"lat": lost.latitude + 0.01, "lng": lost.longitude + 0.01},
-        "steps": [
-            {"instruction": "Head north 500m"},
-            {"instruction": "Turn right at junction"},
-            {"instruction": "Arrive at location"},
-        ],
+        "start": {"lat": getattr(lost, 'latitude', 0), "lng": getattr(lost, 'longitude', 0)},
+        "end": {"lat": (getattr(lost, 'latitude', 0)) + 0.01, "lng": (getattr(lost, 'longitude', 0)) + 0.01},
+        "steps": [{"instruction": "Head north 500m"}, {"instruction": "Turn right at junction"}, {"instruction": "Arrive at location"}],
     }
-    # ===================== Home View =====================
-<<<<<<< HEAD
-=======
-from django.shortcuts import render
+    return JsonResponse(route_data, safe=False)
 
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+
 def home(request):
-    # You can pass any context, e.g., route_data
-    route_data = {}  # or precompute as needed
-    return render(request, "Home.html", {"route_data": route_data})
+    return render(request, "Home.html", {"route_data": {}})
 
-<<<<<<< HEAD
-# ===================== Redirect View for Legacy URLs =====================
+
 def redirect_home(request):
-    """Handle legacy .html URLs and redirect to proper Django URLs"""
     from django.shortcuts import redirect
+
     return redirect('home')
 
-# ===================== Form Views =====================
+
 def report_lost_product(request):
-    if request.method == "POST":
-        name = request.POST.get("name")
-        description = request.POST.get("description")
-        image = request.FILES.get("image")
-        email = request.POST.get("email")
-        phone_number = request.POST.get("phone_number")
-        location = request.POST.get("location")
-        date_lost = request.POST.get("date_lost")
-
-        # Create lost product with user if authenticated
-        lost_data = {
-            'name': name,
-            'description': description,
-            'image': image,
-            'email': email,
-            'phone_number': phone_number,
-            'location': location,
-        }
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        image = request.FILES.get('image')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+        location = request.POST.get('location')
+        date_lost = request.POST.get('date_lost')
+        data = {'name': name, 'description': description, 'image': image, 'email': email, 'phone_number': phone_number, 'location': location}
         if date_lost:
-            lost_data['date_lost'] = date_lost
+            data['date_lost'] = date_lost
         if request.user.is_authenticated:
-            lost_data['user'] = request.user
-        
-        lost = LostProduct.objects.create(**lost_data)
-
-        # Generate embedding and check for matches
-        lost_embedding = generate_embedding(image)
+            data['user'] = request.user
+        lost = LostProduct.objects.create(**data)
+        lost_emb = generate_embedding(image)
         matches_found = 0
-        
-        if lost_embedding is not None:
-            # Compare with all found products
-            found_products = FoundProduct.objects.all()
-            for found in found_products:
+        if lost_emb is not None:
+            for found in FoundProduct.objects.all():
                 if found.image:
-                    found_embedding = generate_embedding(found.image)
-                    if found_embedding is not None:
-                        similarity = cosine_similarity(lost_embedding, found_embedding)
-
-                        match_status = "Matched" if similarity >= 0.8 else "Not Matched"
-                        match = MatchResult.objects.create(
-                            lost_product=lost,
-                            found_product=found,
-                            lost_embedding=lost_embedding,
-                            found_embedding=found_embedding,
-                            similarity_score=similarity,
-                            match_status=match_status,
-                        )
-
-                        if match_status == "Matched":
+                    found_emb = generate_embedding(found.image)
+                    if found_emb is not None:
+                        sim = cosine_similarity(lost_emb, found_emb)
+                        status = 'Matched' if sim >= 0.8 else 'Not Matched'
+                        MatchResult.objects.create(lost_product=lost, found_product=found, lost_embedding=lost_emb, found_embedding=found_emb, similarity_score=sim, match_status=status)
+                        if status == 'Matched':
                             matches_found += 1
                             send_match_notification(lost, found)
+        return render(request, 'Lost_product.html', {'success': True, 'lost_item': lost, 'matches_found': matches_found})
+    return render(request, 'Lost_product.html')
 
-        # Return success message with match info
-        context = {
-            'success': True,
-            'lost_item': lost,
-            'matches_found': matches_found
-        }
-        return render(request, "Lost_product.html", context)
-
-    return render(request, "Lost_product.html")
 
 def report_found_product(request):
-    if request.method == "POST":
-        name = request.POST.get("name")
-        description = request.POST.get("description")
-        image = request.FILES.get("image")
-        email = request.POST.get("email")
-        phone_number = request.POST.get("phone_number")
-        location = request.POST.get("location")
-        date_found = request.POST.get("date_found")
-
-        # Create found product with user if authenticated
-        found_data = {
-            'name': name,
-            'description': description,
-            'image': image,
-            'email': email,
-            'phone_number': phone_number,
-            'location': location,
-        }
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        image = request.FILES.get('image')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+        location = request.POST.get('location')
+        date_found = request.POST.get('date_found')
+        data = {'name': name, 'description': description, 'image': image, 'email': email, 'phone_number': phone_number, 'location': location}
         if date_found:
-            found_data['date_found'] = date_found
+            data['date_found'] = date_found
         if request.user.is_authenticated:
-            found_data['user'] = request.user
-        
-        found = FoundProduct.objects.create(**found_data)
-
-        # Generate embedding and check for matches
-        found_embedding = generate_embedding(image)
+            data['user'] = request.user
+        found = FoundProduct.objects.create(**data)
+        found_emb = generate_embedding(image)
         matches_found = 0
-
-        if found_embedding is not None:
-            # Compare with all lost products
-            lost_products = LostProduct.objects.all()
-            for lost in lost_products:
+        if found_emb is not None:
+            for lost in LostProduct.objects.all():
                 if lost.image:
-                    lost_embedding = generate_embedding(lost.image)
-                    if lost_embedding is not None:
-                        similarity = cosine_similarity(lost_embedding, found_embedding)
-
-                        match_status = "Matched" if similarity >= 0.8 else "Not Matched"
-                        match = MatchResult.objects.create(
-                            lost_product=lost,
-                            found_product=found,
-                            lost_embedding=lost_embedding,
-                            found_embedding=found_embedding,
-                            similarity_score=similarity,
-                            match_status=match_status,
-                        )
-
-                        if match_status == "Matched":
+                    lost_emb = generate_embedding(lost.image)
+                    if lost_emb is not None:
+                        sim = cosine_similarity(lost_emb, found_emb)
+                        status = 'Matched' if sim >= 0.8 else 'Not Matched'
+                        MatchResult.objects.create(lost_product=lost, found_product=found, lost_embedding=lost_emb, found_embedding=found_emb, similarity_score=sim, match_status=status)
+                        if status == 'Matched':
                             matches_found += 1
                             send_match_notification(lost, found)
+        return render(request, 'Found_product.html', {'success': True, 'found_item': found, 'matches_found': matches_found})
+    return render(request, 'Found_product.html')
 
-        # Return success message with match info
-        context = {
-            'success': True,
-            'found_item': found,
-            'matches_found': matches_found
-        }
-        return render(request, "Found_product.html", context)
 
-# ==================== Search Dashboard ====================
 def search_items(request):
-    """
-    Comprehensive search dashboard for lost and found items
-    """
-    context = {
-        'search_performed': False,
-        'lost_items': [],
-        'found_items': [],
-        'matches': [],
-        'total_results': 0,
-        'search_params': {}
-    }
-    
+    context = {'search_performed': False, 'lost_items': [], 'found_items': [], 'matches': [], 'total_results': 0, 'search_params': {}}
     if request.method == 'GET' and (request.GET.get('q') or request.GET.get('category') or request.GET.get('location')):
         context['search_performed'] = True
-        
-        # Get search parameters
         search_query = request.GET.get('q', '').strip()
-        category_filter = request.GET.get('category', '')
         location_filter = request.GET.get('location', '')
-        item_type = request.GET.get('type', 'all')  # all, lost, found
+        item_type = request.GET.get('type', 'all')
         date_from = request.GET.get('date_from', '')
         date_to = request.GET.get('date_to', '')
-        
-        # Store search params for template
-        context['search_params'] = {
-            'q': search_query,
-            'category': category_filter,
-            'location': location_filter,
-            'type': item_type,
-            'date_from': date_from,
-            'date_to': date_to,
-        }
-        
-        # Base querysets
+        context['search_params'] = {'q': search_query, 'location': location_filter, 'type': item_type, 'date_from': date_from, 'date_to': date_to}
         lost_items = LostProduct.objects.all()
         found_items = FoundProduct.objects.all()
-        
-        # Apply text search filter
         if search_query:
-            lost_items = lost_items.filter(
-                name__icontains=search_query
-            ) | lost_items.filter(
-                description__icontains=search_query
-            )
-            found_items = found_items.filter(
-                name__icontains=search_query
-            ) | found_items.filter(
-                description__icontains=search_query
-            )
-        
-        # Apply location filter
+            lost_items = lost_items.filter(name__icontains=search_query) | lost_items.filter(description__icontains=search_query)
+            found_items = found_items.filter(name__icontains=search_query) | found_items.filter(description__icontains=search_query)
         if location_filter:
             lost_items = lost_items.filter(location__icontains=location_filter)
             found_items = found_items.filter(location__icontains=location_filter)
-        
-        # Apply date filters
         if date_from:
             lost_items = lost_items.filter(date_lost__gte=date_from)
             found_items = found_items.filter(date_found__gte=date_from)
-        
         if date_to:
             lost_items = lost_items.filter(date_lost__lte=date_to)
             found_items = found_items.filter(date_found__lte=date_to)
-        
-        # Apply item type filter
         if item_type == 'lost':
             found_items = FoundProduct.objects.none()
         elif item_type == 'found':
             lost_items = LostProduct.objects.none()
-        
-        # Order by most recent
         lost_items = lost_items.order_by('-created_at')
         found_items = found_items.order_by('-created_at')
-        
-        # Get matches for the search results
-        matches = MatchResult.objects.filter(
-            match_status="Matched"
-        ).select_related('lost_product', 'found_product').order_by('-timestamp')
-        
+        matches = MatchResult.objects.filter(match_status='Matched').select_related('lost_product', 'found_product').order_by('-created_at')
         if search_query:
-            matches = matches.filter(
-                lost_product__name__icontains=search_query
-            ) | matches.filter(
-                found_product__name__icontains=search_query
-            )
-        
-        context.update({
-            'lost_items': lost_items,
-            'found_items': found_items,
-            'matches': matches,
-            'total_results': lost_items.count() + found_items.count(),
-        })
-    
-    # Get all unique locations for filter dropdown
+            matches = matches.filter(lost_product__name__icontains=search_query) | matches.filter(found_product__name__icontains=search_query)
+        context.update({'lost_items': lost_items, 'found_items': found_items, 'matches': matches, 'total_results': lost_items.count() + found_items.count()})
     all_locations = set()
     for item in LostProduct.objects.all():
-        if item.location:
+        if getattr(item, 'location', None):
             all_locations.add(item.location)
     for item in FoundProduct.objects.all():
-        if item.location:
+        if getattr(item, 'location', None):
             all_locations.add(item.location)
-    
     context['all_locations'] = sorted(list(all_locations))
-    
-    # Get some stats for the dashboard
     context['stats'] = {
         'total_lost': LostProduct.objects.count(),
         'total_found': FoundProduct.objects.count(),
-        'total_matches': MatchResult.objects.filter(match_status="Matched").count(),
-        'recent_matches': MatchResult.objects.filter(match_status="Matched").order_by('-timestamp')[:5]
+        'total_matches': MatchResult.objects.filter(match_status='Matched').count(),
+    'recent_matches': MatchResult.objects.filter(match_status='Matched').order_by('-created_at')[:5],
     }
-    
     return render(request, "Search_dashboard.html", context)
-
-    return render(request, "Found_product.html")
-=======
-    return JsonResponse(route_data, safe=False)
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e

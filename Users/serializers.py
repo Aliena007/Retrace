@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from rest_framework import serializers
 from django.contrib.auth.models import User as DjangoUser
 from .models import User as ProfileUser, UserProfile
@@ -38,7 +38,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['id', 'profile_picture', 'bio', 'address', 'created_at', 'updated_at']
-=======
+
 from rest_framework import serializers
 from django.contrib.auth.models import User as DjangoUser
 from .models import User as ProfileUser, UserProfile
@@ -78,4 +78,4 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['id', 'profile_picture', 'bio', 'address', 'created_at', 'updated_at']
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
+

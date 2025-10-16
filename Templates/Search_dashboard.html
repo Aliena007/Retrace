@@ -218,7 +218,7 @@
                                             </div>
                                         </div>
                                         <div class="match-meta">
-                                            <span>⏰ Matched on {{ match.timestamp|date:"M d, Y g:i A" }}</span>
+                                            <span>⏰ Matched on {{ match.created_at|date:"M d, Y g:i A" }}</span>
                                         </div>
                                     </div>
                                 {% endfor %}
@@ -266,7 +266,7 @@
                                     <div class="match-info">
                                         <h4>{{ match.lost_product.name }} ↔️ {{ match.found_product.name }}</h4>
                                         <p>{{ match.similarity_score|floatformat:2 }}% similarity match</p>
-                                        <small>{{ match.timestamp|timesince }} ago</small>
+                                        <small>{{ match.created_at|timesince }} ago</small>
                                     </div>
                                 </div>
                             {% endfor %}

@@ -52,11 +52,8 @@ def generate_embedding(image_field):
 
 def cosine_similarity(emb_a_bytes, emb_b_bytes):
     """Compute cosine similarity between two byte-encoded embeddings."""
-<<<<<<< HEAD
+
     if emb_a_bytes is None or emb_b_bytes is None:
-=======
-    if emb_a__bytes is None or emb_b_bytes is None:
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
         return 0.0
     try:
         a = np.frombuffer(emb_a_bytes, dtype=np.float32)
@@ -77,7 +74,7 @@ def cosine_similarity(emb_a_bytes, emb_b_bytes):
 def send_match_notification(lost, found):
     """Create notifications for both users when a match is found."""
     try:
-<<<<<<< HEAD
+
         # Use 'name' instead of 'title' since models use 'name' field
         msg = (
             f"Match found: Lost item '{lost.name}' (id={lost.id}) "
@@ -88,13 +85,12 @@ def send_match_notification(lost, found):
             Notification.objects.create(user=lost.user, message=msg)
         if hasattr(found, 'user') and found.user:
             Notification.objects.create(user=found.user, message=msg)
-=======
+
         msg = (
             f"Match found: Lost item '{lost.title}' (id={lost.id}) "
             f"matched with Found item '{found.title}' (id={found.id})."
         )
         Notification.objects.create(user=lost.user, message=msg)
         Notification.objects.create(user=found.user, message=msg)
->>>>>>> 8b1e1d938e70917f9e7bc0a124a56dd9f9496b7e
     except Exception:
         pass
